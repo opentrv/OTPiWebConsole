@@ -1,0 +1,85 @@
+<html>
+<!-- 
+The OpenTRV project licenses this file to you
+under the Apache Licence, Version 2.0 (the "Licence");
+you may not use this file except in compliance
+with the Licence. You may obtain a copy of the Licence at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the Licence is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied. See the Licence for the
+specific language governing permissions and limitations
+under the Licence.
+
+Author(s) / Copyright (s): Andy Joiner 2017
+-->
+
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
+<script type="text/javascript" charset="utf-8">
+    var socket = io.connect('http://' + document.domain + ':' + location.port);
+
+    socket.on('connect', function() {
+        $("#log").prepend($('<p>'+'Browser connected to Pi'+'</p>').fadeIn('fast'));
+    });
+
+    var lastMessage = null;
+    socket.on('router_to_browser', function(data) {
+        if((lastMessage == ">" && data == "") || (lastMessage == "" && data == ">")) {
+            $( "#prompt" ).stop(true, false).fadeTo(100,1).fadeTo( 1000, 0 );
+        } else {
+            $("#log").prepend($('<p>RX'+data+'</p>').fadeIn('fast'));
+        }
+        lastMessage = data
+    });
+
+    socket.on('router_to_browser_echo', function(data) {
+        $("#log").prepend($('<p>TX '+data+'</p>').fadeOut('fast'));
+    });
+
+    function doSendMessage() {
+        var message = document.getElementById('message').value
+        socket.emit('browser_to_router', message);
+        document.getElementById('message').value = ""
+    }
+
+    function portChange() {
+        document.getElementById('sendMessage').disabled = true;
+        var port = document.getElementById('port').value
+        socket.emit('port_change', port);
+    }
+
+    socket.on('port_changed', function(newPort) {
+        document.getElementById('port').value = newPort;
+        if(newPort.length > 0) {
+            document.getElementById('sendMessage').disabled = false;
+            $("#log").prepend($('<p>Connected to '+newPort+'</p>').fadeOut('fast'));
+        } else {
+            document.getElementById('sendMessage').disabled = true;
+            $("#log").prepend($('<p>Comm port disconnected</p>').fadeOut('fast'));
+        }
+    });
+
+
+</script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<body>
+<div>
+    <h1>Port</h1>
+    <select onchange="portChange();" id="port">
+      <option value=""></option>
+      <option value="COM4">COM4</option>
+      <option value="/dev/serial0">/dev/serial0</option>
+      <option value="simulator">simulator</option>
+    </select>
+    <h1>Command</h1>
+    <input type="text" id="message" name="message" autofocus="autofocus" value="" onkeydown = "if (event.keyCode == 13)
+                        document.getElementById('sendMessage').click()">
+    <input id="sendMessage" type="button" disabled="true" value="Send" onclick="doSendMessage();" />
+</div>
+<div id="prompt" style="opacity: 0">&gt;</div>
+<h1>Log</h1>
+<div id="log">
+</div>
