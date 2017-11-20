@@ -12,7 +12,7 @@ Built on [Python 3](https://www.python.org/download/releases/3.0/), [Flask](http
 
 ### Usage
 
-Connect an OpentTRV device via serial cable to a RaspberryPi or PC, then run app.py from the Pi/PC.  app.py starts the Flask web server, allowing you to interrogate the OpenTRV device from a browser.
+Connect an OpenTRV device via serial cable to a RaspberryPi or PC, then run app.py from the Pi/PC.  app.py starts the Flask web server, allowing you to interrogate the OpenTRV device from a browser.
 
 ### Transport
 
