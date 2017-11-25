@@ -30,13 +30,13 @@ Author(s) / Copyright (s): Andy Joiner 2017
         if((lastMessage == ">" && data == "") || (lastMessage == "" && data == ">")) {
             $( "#prompt" ).stop(true, false).fadeTo(100,1).fadeTo( 1000, 0 );
         } else {
-            $("#log").prepend($('<p>RX'+data+'</p>').fadeIn('fast'));
+            $("#log").prepend($('<p>RX: '+data+'</p>').fadeIn('fast'));
         }
         lastMessage = data
     });
 
     socket.on('router_to_browser_echo', function(data) {
-        $("#log").prepend($('<p>TX '+data+'</p>').fadeOut('fast'));
+        $("#log").prepend($('<p>TX: '+data+'</p>').fadeOut('fast'));
     });
 
     function doSendMessage() {
